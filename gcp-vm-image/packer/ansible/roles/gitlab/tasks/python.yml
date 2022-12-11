@@ -1,0 +1,5 @@
+---
+- name: pythonインストール
+  yum:
+    pkg:
+      - python3

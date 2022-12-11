@@ -1,0 +1,22 @@
+---
+- name: yum-utilsパッケージインストール
+  yum:
+    pkg:
+      - yum-utils
+
+- name: Dockerインストール用リポジトリダウンロード
+  shell: |
+    yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  become: yes
+
+- name: Dockerインストール
+  yum:
+    pkg:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+
+- name: dockerの有効化
+  systemd:
+    name: docker
+    enabled: true

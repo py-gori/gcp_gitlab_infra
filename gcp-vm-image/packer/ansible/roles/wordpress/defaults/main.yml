@@ -1,0 +1,5 @@
+### for mysql
+mysql_root_password: "Test1234==!"
+add_users:
+  - name: wpadm
+    password: Test1234==!

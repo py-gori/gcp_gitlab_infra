@@ -1,0 +1,2 @@
+jsonschema
+google-api-python-client

@@ -1,0 +1,60 @@
+---
+- name: mysqlリポジトリのインストール
+  yum:
+    pkg: https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
+
+- name: mysqlのインストール
+  yum:
+    pkg:
+      - mysql-community-server
+      - mysql-devel
+      - mysql-utilities
+      - MySQL-python
+
+- name: mysqld自動起動設定
+  service:
+    name: mysqld
+    state: started
+    enabled: true
+
+- name: root password取得
+  shell: "sudo grep 'A temporary password is generated for root@localhost' /var/log/mysqld.log | awk -F ' ' '{print $(NF)}'"
+  register: root_password
+
+- name: root password更新
+  command: mysql --user root --password={{ root_password.stdout }} --connect-expired-password --execute="ALTER USER 'root'@'localhost' IDENTIFIED with mysql_native_password BY '{{ mysql_root_password }}';"
+
+- name: /root/.my.cnfにrootパスワード反映
+  lineinfile:
+    dest: "/root/.my.cnf"
+    owner: root
+    group: root
+    mode: 0600
+    state: present
+    create: yes
+    line: '{{ item }}'
+  with_items:
+    - '[client]'
+    - 'user=root'
+    - 'password="{{ mysql_root_password }}"'
+  become: yes
+
+- name: mysql user作成
+  mysql_user:
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+    priv: '*.*:ALL,GRANT'
+    state: present
+    host: '%'
+  with_items:
+    - "{{ add_users }}"
+
+- name: Wordpress用DB作成
+  mysql_db:
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    name: wp
+    state: present
+    encoding: utf8mb4

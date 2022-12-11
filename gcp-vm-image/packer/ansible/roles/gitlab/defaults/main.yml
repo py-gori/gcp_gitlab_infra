@@ -1,0 +1,7 @@
+### for gitlab
+gitlab_data_dir: "/data"
+gitlab_system_user: "git"
+gitlab_system_group: "git"
+gitlab_backuplog_dir: "/var/log/middle"
+gitlab_backupscript_dir: "/usr/local/script/gitlab"
+gcr_version: "2.0.0"

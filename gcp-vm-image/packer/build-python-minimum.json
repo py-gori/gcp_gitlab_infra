@@ -1,0 +1,48 @@
+{
+  "variables": {
+    "project_id": "",
+    "source_image_family": "",
+    "zone": "",
+    "machine_type": "",
+    "tags": "",
+    "role": "python-minimum"
+  },
+  "builders": [
+    {
+      "type": "googlecompute",
+      "project_id": "{{user `project_id`}}",
+      "source_image_family": "{{user `source_image_family`}}",
+      "ssh_username": "packer",
+      "zone": "{{user `zone`}}",
+      "tags": "{{user `tags`}}",
+      "disk_size": 20,
+      "image_name": "{{user `role`}}-{{timestamp}}",
+      "machine_type": "{{user `machine_type`}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "{{ .Vars }} sudo -E sh '{{ .Path }}'",
+      "inline": ["sudo yum update -y", "sudo yum install ansible -y"]
+    },
+    {
+      "type": "ansible-local",
+      "extra_arguments": ["--extra-vars \"role={{user `role`}}\""],
+      "playbook_file": "ansible/playbook.yml",
+      "role_paths": ["ansible/roles/base", "ansible/roles/{{user `role`}}"]
+    },
+    {
+      "type": "file",
+      "source": "serverspec",
+      "destination": "/tmp"
+    },
+    {
+      "type": "shell",
+      "execute_command": "{{ .Vars }} sudo -E sh '{{ .Path }}'",
+      "environment_vars": "role={{user `role`}}",
+      "scripts": ["scripts/serverspec.sh", "scripts/cleanup.sh"]
+    }
+  ]
+}
+  

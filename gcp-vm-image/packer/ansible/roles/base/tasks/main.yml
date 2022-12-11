@@ -1,0 +1,82 @@
+---
+- name: stackdriver logging agentのインストール
+  shell: |
+    curl -sSO https://dl.google.com/cloudagents/install-logging-agent.sh
+    sudo bash install-logging-agent.sh
+
+# 起動スクリプトのrestartとサービス自動起動で二重起動の問題が発生する可能性があるため無効化する。
+- name: stackdriver logging agentのサービス自動起動無効化
+  shell: |
+    sudo systemctl disable google-fluentd
+
+# stackdriverに転送したいファイルは自分でコンフィグを設定する必要がある
+- name: stackdriver loggingのconfig.dにあるデフォルトで用意されている各種ミドル転送設定を検索
+  find:
+    paths: /etc/google-fluentd/config.d/
+    patterns: "*.conf"
+  register: _google_fluentd_default_conf
+
+- name: 検索した結果を削除する
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ _google_fluentd_default_conf.files }}"
+
+- name: stackdriver ログ転送ファイル配置(syslog)
+  copy: src=../files/etc/google-fluentd/config.d/{{ item }} dest=/etc/google-fluentd/config.d/. mode=640
+  with_items:
+    - service-syslog.conf
+    - service-operation.conf
+
+- name: 運用管理に必要なパッケージのインストール
+  yum:
+    pkg:
+      - jq
+      - zip
+      - unzip
+      - bind-utils
+      - telnet
+      - tcpdump
+      - sysstat
+      - traceroute
+      - dstat
+      - iotop
+      - lsof
+      - wget
+      - git
+      - yum-changelog
+
+- name: yum upgrade 'sudo' (CVE-2021-3156対応)
+  yum:
+    name: 'sudo'
+    state: latest
+
+- name: ロケールの変更
+  command: localectl set-locale LANG=ja_JP.utf8
+
+- name: タイムゾーンの変更
+  timezone:
+    name: Asia/Tokyo
+
+- name: scriptディレクトリ作成
+  file:
+    path: /usr/local/script
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: OS上の操作ログ取得の為のディレクトリ権限設定
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    mode: "{{ item.mode }}"
+  loop:
+    - { path: /var/log, mode: 755 }
+    - { path: /var/log/operation, mode: 777 }
+
+- name: OS上の操作ログ取得スクリプトの設置
+  copy: src=../files/etc/profile.d/operation.sh dest=/etc/profile.d/. mode=744
+
+- name: OS上の操作ログ削除のcron設定
+  copy: src=../files/etc/cron.d/rotate-opelog dest=/etc/cron.d/. mode=600

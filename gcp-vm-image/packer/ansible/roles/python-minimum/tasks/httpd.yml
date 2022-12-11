@@ -1,0 +1,11 @@
+---
+- name: apacheのインストール
+  yum:
+    pkg:
+      - httpd
+
+- name: httpd自動起動設定
+  service:
+    name: httpd
+    state: started
+    enabled: true

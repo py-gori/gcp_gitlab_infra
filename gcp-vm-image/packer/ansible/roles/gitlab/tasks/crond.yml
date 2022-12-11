@@ -1,0 +1,20 @@
+---
+- name: backupスクリプト配置ディレクトリ作成
+  file:
+    path: "{{ gitlab_backupscript_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: gitlabバックアップシェルの配置
+  copy: src=../files/usr/local/script/gitlab_backup.sh dest=/usr/local/script/gitlab/. mode=755
+
+- name: gitlabバックアップcron設定
+  become: True
+  cron:
+    name: gitlab_backup
+    minute: 0
+    hour: 5
+    job: "/usr/local/script/gitlab/gitlab_backup.sh > /dev/null 2>&1"
+    state: present

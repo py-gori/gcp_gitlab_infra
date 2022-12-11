@@ -1,0 +1,4 @@
+---
+- include: firewalld.yml
+- include: httpd.yml
+- include: python.yml

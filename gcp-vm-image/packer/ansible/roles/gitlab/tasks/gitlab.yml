@@ -1,0 +1,60 @@
+---
+- name: GitLab依存パッケージのインストール
+  yum:
+    pkg:
+      - curl
+      - policycoreutils-python
+      - openssh-server
+
+- name: GitLabリポジトリのダウンロード
+  shell: |
+    curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.rpm.sh | sudo bash
+
+- name: GitLabのインストール
+  yum:
+    pkg:
+      - gitlab-ee-13.7.4-ee.0.el7
+
+- name: GitLabコンフィグ再構成
+  shell: gitlab-ctl reconfigure
+  become: yes
+  become_user: root
+
+- name: GitLabコンフィグ追記
+  blockinfile:
+    path: /etc/gitlab/gitlab.rb
+    insertafter: EOF
+    marker: "## {mark} ANSIBLE MANAGED BLOCK"
+    block: "{{ item }}"
+  with_file:
+    - ../files/etc/gitlab/gitlab
+
+- name: データディレクトリ作成
+  file:
+    path: "{{ gitlab_data_dir }}"
+    state: directory
+    owner: "{{ gitlab_system_user }}"
+    group: "{{ gitlab_system_group }}"
+    mode: 0755
+
+- name: sslディレクトリ作成
+  file:
+    path: /etc/gitlab/ssl
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+
+- name: GitLabバックアップログディレクトリ作成
+  file:
+    path: "{{ gitlab_backuplog_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: stackdriver ログ転送ファイル配置(gitlab)
+  copy: src=../files/etc/google-fluentd/config.d/{{ item }} dest=/etc/google-fluentd/config.d/. mode=640
+  with_items:
+    - gitlab-nginx.conf
+    - gitlab-backup.conf

@@ -1,0 +1,3 @@
+---
+- name: gitlabバックアップログローテート設定
+  copy: src=../files/etc/logrotate.d/gitlab-backuplog dest=/etc/logrotate.d/. mode=644

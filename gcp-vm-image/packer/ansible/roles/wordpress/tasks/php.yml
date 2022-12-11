@@ -1,0 +1,20 @@
+---
+- name: Remiリポジトリ追加の為、EPELリポジトリ追加
+  yum:
+    pkg:
+      - epel-release
+
+- name: phpインストール用Remiリポジトリのインストール
+  yum:
+    pkg: http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+
+- name: phpのインストール
+  yum:
+    enablerepo: remi-php80
+    pkg:
+      - php
+      - php-devel
+      - php-mbstring
+      - php-pdo
+      - php-gd
+      - php-mysqlnd

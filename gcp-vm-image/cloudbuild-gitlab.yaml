@@ -1,0 +1,13 @@
+steps:
+  - name: "gcr.io/$PROJECT_ID/packer"
+    args:
+      [
+        "build",
+        "-var-file=variables.json",
+        "-var",
+        "project_id=$PROJECT_ID",
+        "build-gitlab.json",
+      ]
+    dir: "packer"
+
+timeout: 1500s

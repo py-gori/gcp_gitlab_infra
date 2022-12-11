@@ -1,0 +1,33 @@
+---
+- name: apacheのインストール
+  yum:
+    pkg:
+      - httpd
+
+- name: httpd自動起動設定
+  service:
+    name: httpd
+    state: started
+    enabled: true
+
+- name: httpdドキュメントルート変更
+  lineinfile:
+    dest: '/etc/httpd/conf/httpd.conf'
+    state: present
+    backrefs: yes
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  with_items:
+  - regexp: '^DocumentRoot \"\/var\/www\/'
+    line: 'DocumentRoot "/var/www/html/wordpress"'
+
+- name: httpdルートディレクトリ変更
+  lineinfile:
+    dest: '/etc/httpd/conf/httpd.conf'
+    state: present
+    backrefs: yes
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  with_items:
+  - regexp: '^<Directory \"\/var\/www\">'
+    line: '<Directory "/var/www/html/wordpress">'

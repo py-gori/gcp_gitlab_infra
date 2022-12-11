@@ -1,0 +1,8 @@
+---
+- include: gitlab.yml
+- include: firewalld.yml
+- include: docker.yml
+- include: packer.yml
+- include: python.yml
+- include: logrotate.yml
+- include: crond.yml

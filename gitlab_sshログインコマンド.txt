@@ -1,0 +1,1 @@
+gcloud compute ssh my-gitlab01 --zone asia-northeast1-a --tunnel-through-iap

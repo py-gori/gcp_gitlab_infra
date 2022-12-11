@@ -1,0 +1,26 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "title": "PyJsonValidate",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "switch",
+        "zone",
+        "target"
+    ],
+    "properties": {
+        "switch": {
+            "type": "string",
+            "enum": [
+                "on",
+                "off"
+            ]
+        },
+        "zone": {
+            "type": "string"
+        },
+        "target": {
+            "type": "string"
+        }
+    }
+}

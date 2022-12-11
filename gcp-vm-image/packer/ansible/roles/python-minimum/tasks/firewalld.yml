@@ -1,0 +1,6 @@
+---
+- name: firewalldの無効化
+  systemd:
+    name: firewalld
+    state: stopped
+    enabled: false

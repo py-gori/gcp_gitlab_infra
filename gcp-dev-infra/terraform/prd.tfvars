@@ -1,0 +1,15 @@
+env                                 = "prd"
+region                              = "asia-northeast1"
+zone                                = "asia-northeast1-a"
+gitlab_machine_type                 = "e2-standard-2"
+gitlab_source_image                 = "gitlab-1618788579"
+gitlab_disk_size_gb                 = 20
+gitlab_storage_lifecycle_delete_age = "7"
+my_global_ip                        = [""]
+gitlab_email_from                   = "<YOUR_EMAIL>"
+smtp_address                        = "smtp.gmail.com"
+smtp_user_name                      = "<USERNAME>"
+smtp_password                       = "<PASSWORD>"
+smtp_domain                         = "smtp.gmail.com"
+my-zone-resource-name               = "gitlab-zone-private"
+my-dns-name                         = "<DOMAIN>"

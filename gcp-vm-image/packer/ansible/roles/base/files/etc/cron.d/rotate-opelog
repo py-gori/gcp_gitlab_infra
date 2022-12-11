@@ -1,0 +1,5 @@
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+
+00 5 * * * root find /var/log/operation -mtime +3 -name "*.log" | xargs rm -f
